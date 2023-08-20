@@ -38,8 +38,8 @@
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:scaleType="center"
-            android:tint="?android:textColorSecondary"
-            tools:src="@drawable/ic_apple_24dp" />
+            tools:src="@drawable/ic_apple_24dp"
+            app:tint="?android:textColorSecondary" />
 
         <me.zhanghai.android.materialprogressbar.MaterialProgressBar
             android:id="@+id/progress"

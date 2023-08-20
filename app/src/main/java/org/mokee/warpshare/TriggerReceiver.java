@@ -42,7 +42,7 @@ public class TriggerReceiver extends BroadcastReceiver {
         intent.putExtra(TriggerReceiver.EXTRA_CALLBACK_INTENT, callbackIntent);
 
         return PendingIntent.getBroadcast(context, callbackIntent.hashCode(),
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                intent, PendingIntent.FLAG_MUTABLE);
     }
 
     public static PendingIntent getTriggerIntent2(Context context, int callbackType, ScanResult result) {
@@ -56,7 +56,7 @@ public class TriggerReceiver extends BroadcastReceiver {
         intent.putExtra(EXTRA_LIST_SCAN_RESULT,scanList);
 
         return PendingIntent.getBroadcast(context, callbackIntent.hashCode(),
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                intent, PendingIntent.FLAG_MUTABLE);
     }
 
     @Override

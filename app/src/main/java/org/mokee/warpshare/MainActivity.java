@@ -234,7 +234,8 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
             return true;
         }
 
-        final boolean granted = checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+        // final boolean granted = checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+        final boolean granted = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PERMISSION_GRANTED;
         final boolean ready = mAirDropManager.ready() == STATUS_OK;
         if (!granted || !ready) {
             mIsInSetup = true;

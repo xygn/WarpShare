@@ -42,6 +42,7 @@ import static org.apache.commons.compress.archivers.cpio.CpioConstants.C_IROTH;
 import static org.apache.commons.compress.archivers.cpio.CpioConstants.C_IRUSR;
 import static org.apache.commons.compress.archivers.cpio.CpioConstants.C_ISREG;
 import static org.apache.commons.compress.archivers.cpio.CpioConstants.C_IWUSR;
+import static org.apache.commons.compress.archivers.cpio.CpioConstants.FORMAT_NEW;
 import static org.apache.commons.compress.archivers.cpio.CpioConstants.FORMAT_OLD_ASCII;
 
 class AirDropArchiveUtil {
@@ -49,9 +50,11 @@ class AirDropArchiveUtil {
     static void pack(List<Entity> entities, OutputStream output,
                      GossipyInputStream.Listener streamReadListener) throws IOException {
         try (final GzipCompressorOutputStream gzip = new GzipCompressorOutputStream(output);
-             final CpioArchiveOutputStream cpio = new CpioArchiveOutputStream(gzip, FORMAT_OLD_ASCII,512, CharsetNames.UTF_8)) {
+            final CpioArchiveOutputStream cpio = new CpioArchiveOutputStream(gzip, FORMAT_OLD_ASCII,512, CharsetNames.UTF_8)) {
             for (Entity entity : entities) {
                 final CpioArchiveEntry entry = new CpioArchiveEntry(FORMAT_OLD_ASCII, entity.path());
+
+
                 entry.setMode(C_ISREG | C_IRUSR | C_IWUSR | C_IRGRP | C_IROTH);
                 entry.setTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 

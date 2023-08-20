@@ -40,6 +40,7 @@ import java.net.SocketAddress;
 import java.text.ParseException;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -65,9 +66,11 @@ class AirDropClient {
     private NetworkInterface mInterface;
 
     AirDropClient(CertificateManager certificateManager) {
+        SSLSocketFactory sslSocketFactory = certificateManager.createClientSSLSocketFactory();
+        X509TrustManager trustManager = certificateManager.getTrustManager();
         mHttpClient = new OkHttpClient.Builder()
                 .socketFactory(new LinkLocalAddressSocketFactory())
-                .sslSocketFactory(certificateManager.createClientSSLSocketFactory())
+                .sslSocketFactory(sslSocketFactory, trustManager)
                 .hostnameVerifier((hostname, session) -> true)
                 .build();
     }

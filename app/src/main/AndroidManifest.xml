@@ -16,8 +16,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.mokee.warpshare">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk 
         tools:overrideLibrary="androidx.preference,com.gemalto.jp2,com.bumptech.glide.gifdecoder,com.bumptech.glide,com.koushikdutta.async" />
@@ -26,8 +25,24 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH"  android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+
+    <!-- android 12 add -->
+    <!-- Needed only if your app looks for Bluetooth devices.
+             If your app doesn't use Bluetooth scan results to derive physical
+             location information, you can strongly assert that your app
+             doesn't derive physical location. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- Needed only if your app makes the device discoverable to Bluetooth
+      devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <!-- Needed only if your app communicates with already-paired Bluetooth
+           devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!--bibo01 : hardware option-->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
+    <!-- android 12 add -->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -38,8 +53,16 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Required only if your app targets Android 13. -->
+    <!-- Declare one or more the following permissions only if your app needs
+    to access data thats protected by them. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Required to maintain app compatibility. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -65,7 +88,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -74,7 +98,8 @@
 
         <activity
             android:name=".ShareActivity"
-            android:theme="@style/ShareTheme">
+            android:theme="@style/ShareTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -111,7 +136,8 @@
             android:exported="true"
             tools:ignore="ExportedReceiver" />
 
-        <receiver android:name=".InitializeReceiver">
+        <receiver android:name=".InitializeReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

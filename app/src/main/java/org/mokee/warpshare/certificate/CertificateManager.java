@@ -81,6 +81,10 @@ public class CertificateManager {
         }
     }
 
+    public X509TrustManager getTrustManager() {
+        return new TrustAllCerts();
+    }
+
     public class TrustAllCerts implements X509TrustManager{
 
         @Override
