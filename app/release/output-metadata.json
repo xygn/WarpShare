@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "org.mokee.warpshare",
+  "applicationId": "com.moseoridev.warpshare",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 3,
-      "versionName": "2.0.1",
+      "versionCode": 5,
+      "versionName": "2.0.2",
       "outputFile": "app-release.apk"
     }
   ],
