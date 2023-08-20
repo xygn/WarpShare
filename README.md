@@ -4,6 +4,7 @@
 
 ![License](https://img.shields.io/badge/license-Apache%202.0-green)
 ![Android Compatible](https://img.shields.io/badge/Android-yes-blue)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fmoseoridev%2FWarpShare&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 WarpShare is an Android app that enables file transfer using AirDrop-like functionality from your Android device to Apple devices. This project is a fork of [vinint/MoKee-WarpShare](https://github.com/vinint/MoKee-WarpShare), with modifications by [moseoridev](https://github.com/moseoridev) to make it compatible with the latest version of Android.
 
