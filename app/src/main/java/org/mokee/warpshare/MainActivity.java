@@ -25,47 +25,30 @@ import android.os.Bundle;
 import android.text.format.Formatter;
 import android.util.ArrayMap;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.mokee.warpshare.airdrop.AirDropManager;
 import org.mokee.warpshare.airdrop.AirDropPeer;
-import org.mokee.warpshare.base.DiscoverListener;
-import org.mokee.warpshare.base.Entity;
-import org.mokee.warpshare.base.Peer;
-import org.mokee.warpshare.base.SendListener;
-import org.mokee.warpshare.base.SendingSession;
+import org.mokee.warpshare.base.*;
 import org.mokee.warpshare.nearbysharing.NearShareManager;
 import org.mokee.warpshare.nearbysharing.NearSharePeer;
-import org.mokee.warpshare.wifip2p.AndroidWifiP2pController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static org.mokee.warpshare.airdrop.AirDropManager.STATUS_OK;
 
-import com.cretin.tools.fanpermission.FanPermissionListener;
-import com.cretin.tools.fanpermission.FanPermissionUtils;
-
-@SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class MainActivity extends AppCompatActivity implements DiscoverListener {
 
     private static final String TAG = "MainActivity";
@@ -114,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
 
         mAirDropManager = new AirDropManager(this,
                 WarpShareApplication.from(this).getCertificateManager());
-        mAirDropManager.registerTrigger(TriggerReceiver.getTriggerIntent(this),this);
+        mAirDropManager.registerTrigger(TriggerReceiver.getTriggerIntent(this), this);
 
         mNearShareManager = new NearShareManager(this);
 
@@ -174,13 +157,11 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -204,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
                 if (resultCode != RESULT_OK) {
                     finish();
                 } else {
-                    mAirDropManager.registerTrigger(TriggerReceiver.getTriggerIntent(this),this);
+                    mAirDropManager.registerTrigger(TriggerReceiver.getTriggerIntent(this), this);
                 }
                 break;
             default:
@@ -234,8 +215,13 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
             return true;
         }
 
-        // final boolean granted = checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
-        final boolean granted = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PERMISSION_GRANTED;
+        final boolean granted;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            granted = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PERMISSION_GRANTED;
+        } else {
+            granted = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+        }
+
         final boolean ready = mAirDropManager.ready() == STATUS_OK;
         if (!granted || !ready) {
             mIsInSetup = true;
@@ -263,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         handleSendFailed(peer);
     }
 
-    private void handleSendConfirming(Peer peer, PeerState state) {
+    private void handleSendConfirming(PeerState state) {
         state.status = R.string.status_waiting_for_confirm;
         state.bytesTotal = -1;
         state.bytesSent = 0;
@@ -272,19 +258,19 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         mWakeLock.acquire();
     }
 
-    private void handleSendRejected(Peer peer, PeerState state) {
+    private void handleSendRejected(PeerState state) {
         state.status = R.string.status_rejected;
         mAdapter.notifyDataSetChanged();
         mShouldKeepDiscovering = false;
         mWakeLock.release();
     }
 
-    private void handleSending(Peer peer, PeerState state) {
+    private void handleSending(PeerState state) {
         state.status = R.string.status_sending;
         mAdapter.notifyDataSetChanged();
     }
 
-    private void handleSendSucceed(Peer peer, PeerState state) {
+    private void handleSendSucceed(PeerState state) {
         state.status = 0;
         mAdapter.notifyDataSetChanged();
         mShouldKeepDiscovering = false;
@@ -347,17 +333,17 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
             return;
         }
 
-        handleSendConfirming(peer, state);
+        handleSendConfirming(state);
 
         final SendListener listener = new SendListener() {
             @Override
             public void onAccepted() {
-                handleSending(peer, state);
+                handleSending(state);
             }
 
             @Override
             public void onRejected() {
-                handleSendRejected(peer, state);
+                handleSendRejected(state);
             }
 
             @Override
@@ -369,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
 
             @Override
             public void onSent() {
-                handleSendSucceed(peer, state);
+                handleSendSucceed(state);
             }
 
             @Override
@@ -384,6 +370,18 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         } else if (peer instanceof NearSharePeer) {
             state.sending = mNearShareManager.send((NearSharePeer) peer, entities, listener);
         }
+    }
+
+    private static class PeerState {
+
+        @StringRes
+        int status = 0;
+
+        long bytesTotal = -1;
+        long bytesSent = 0;
+
+        SendingSession sending = null;
+
     }
 
     private class PeersAdapter extends RecyclerView.Adapter<PeersAdapter.ViewHolder> {
@@ -484,18 +482,6 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
             }
 
         }
-
-    }
-
-    private class PeerState {
-
-        @StringRes
-        int status = 0;
-
-        long bytesTotal = -1;
-        long bytesSent = 0;
-
-        SendingSession sending = null;
 
     }
 
