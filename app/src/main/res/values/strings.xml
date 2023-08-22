@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2019 The MoKee Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +18,7 @@
 
     <string name="app_name">WarpShare</string>
 
-    <string name="menu_settings">Settings…</string>
+    <string name="menu_settings">Settings</string>
 
     <string name="introduction">WarpShare can rapidly send files to others nearby, without any usage of mobile data.</string>
     <string name="hint_perm">To use WarpShare, several permissions are required.</string>
@@ -84,5 +83,7 @@
     <string name="settings_discoverable">Discoverable</string>
     <string name="settings_discoverable_on">Your device will appear to others as a recipient</string>
     <string name="settings_discoverable_off">Your device will not be discoverable</string>
+    <string name="about">About</string>
+    <string name="title_activity_about">AboutActivity</string>
 
 </resources>

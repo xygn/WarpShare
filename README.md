@@ -43,6 +43,7 @@ release and download the .apk file for Android installation.
 [Download from GitHub Releases](https://github.com/moseoridev/WarpShare/releases)
 
 or you can use IzzyOnDroid:
+
 [![IzzyOnDroid](https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png)](https://apt.izzysoft.de/fdroid/index/apk/com.moseoridev.warpshare/)
 
 ## Contributing & Issues 💡

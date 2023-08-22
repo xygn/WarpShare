@@ -188,6 +188,10 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
+//        else if (item.getItemId() == R.id.about) {
+//            startActivity(new Intent(this, AboutActivity.class));
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
