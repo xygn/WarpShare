@@ -8,7 +8,7 @@ android {
         minSdkVersion 27
         targetSdkVersion 34
         compileSdk 34
-        versionCode 8
+        versionCode 9
         versionName '2.0.3'
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"

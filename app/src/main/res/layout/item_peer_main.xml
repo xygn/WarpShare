@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2019 The MoKee Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,8 +39,8 @@
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:scaleType="center"
-            tools:src="@drawable/ic_apple_24dp"
-            app:tint="?android:textColorSecondary" />
+            app:tint="?android:textColorSecondary"
+            tools:src="@drawable/ic_apple_24dp" />
 
         <me.zhanghai.android.materialprogressbar.MaterialProgressBar
             android:id="@+id/progress"
@@ -71,7 +70,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="1"
-            android:textColor="@android:color/black"
             android:textSize="16sp"
             tools:text="XiNGRZ\'s iPhone" />
 
