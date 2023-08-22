@@ -3,16 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 34
-
     defaultConfig {
         applicationId 'com.moseoridev.warpshare'
         minSdkVersion 27
         targetSdkVersion 34
-        versionCode 5
-        versionName '2.0.2'
+        compileSdk 34
+        versionCode 6
+        versionName '2.0.3'
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a"
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,10 +23,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
     namespace 'org.mokee.warpshare'
 }
 
@@ -50,7 +45,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.gemalto.jp2:jp2-android:1.0'
     implementation 'com.koushikdutta.async:androidasync:2.2.1'
-    implementation 'org.apache.commons:commons-compress:1.20'
+    implementation 'org.apache.commons:commons-compress:1.21'
     implementation 'com.googlecode.plist:dd-plist:1.22'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.jmdns:jmdns:3.5.1'

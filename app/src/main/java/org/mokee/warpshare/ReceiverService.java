@@ -16,12 +16,7 @@
 
 package org.mokee.warpshare;
 
-import android.app.DownloadManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.*;
 import android.bluetooth.le.ScanResult;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,29 +24,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
-
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import org.mokee.warpshare.airdrop.AirDropManager;
 import org.mokee.warpshare.airdrop.AirDropManager.ReceivingSession;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Source;
+import java.util.*;
 
 import static android.app.Notification.CATEGORY_SERVICE;
 import static android.app.Notification.CATEGORY_STATUS;
@@ -66,10 +52,8 @@ import static org.mokee.warpshare.airdrop.AirDropManager.STATUS_OK;
 
 public class ReceiverService extends Service implements AirDropManager.ReceiverListener {
 
-    private static final String TAG = "ReceiverService";
-
     public static final String ACTION_SCAN_RESULT = "org.mokee.warpshare.SCAN_RESULT";
-
+    private static final String TAG = "ReceiverService";
     private static final String ACTION_TRANSFER_ACCEPT = "org.mokee.warpshare.TRANSFER_ACCEPT";
     private static final String ACTION_TRANSFER_REJECT = "org.mokee.warpshare.TRANSFER_REJECT";
     private static final String ACTION_TRANSFER_CANCEL = "org.mokee.warpshare.TRANSFER_CANCEL";
@@ -169,7 +153,7 @@ public class ReceiverService extends Service implements AirDropManager.ReceiverL
                         getString(R.string.settings),
                         PendingIntent.getActivity(this, 0,
                                 new Intent(this, SettingsActivity.class),
-                                PendingIntent.FLAG_UPDATE_CURRENT))
+                                PendingIntent.FLAG_MUTABLE))
                         .build())
                 .setOngoing(true)
                 .build());
@@ -227,7 +211,7 @@ public class ReceiverService extends Service implements AirDropManager.ReceiverL
         if (results != null) {
             if (callbackType == CALLBACK_TYPE_FIRST_MATCH) {
                 for (ScanResult result : results) {
-                    mDevices.add(result == null?"00:00:00:00:00:00":result.getDevice().getAddress());
+                    mDevices.add(result == null ? "00:00:00:00:00:00" : result.getDevice().getAddress());
                 }
             } else if (callbackType == CALLBACK_TYPE_MATCH_LOST) {
                 for (ScanResult result : results) {

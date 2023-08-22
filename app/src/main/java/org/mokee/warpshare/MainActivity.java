@@ -17,6 +17,7 @@
 package org.mokee.warpshare;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,8 @@ import android.view.*;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -70,23 +73,46 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
     private NearShareManager mNearShareManager;
 
     private boolean mIsInSetup = false;
-
+    ActivityResultLauncher<Intent> setupActivityResultLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        mIsInSetup = false;
+                        if (result.getResultCode() != Activity.RESULT_OK) {
+                            finish();
+                        } else {
+                            mAirDropManager.registerTrigger(TriggerReceiver.getTriggerIntent(this), this);
+                        }
+                    });
     private final WifiStateMonitor mWifiStateMonitor = new WifiStateMonitor() {
         @Override
         public void onReceive(Context context, Intent intent) {
             setupIfNeeded();
         }
     };
-
     private final BluetoothStateMonitor mBluetoothStateMonitor = new BluetoothStateMonitor() {
         @Override
         public void onReceive(Context context, Intent intent) {
             setupIfNeeded();
         }
     };
-
     private boolean mIsDiscovering = false;
     private boolean mShouldKeepDiscovering = false;
+    ActivityResultLauncher<Intent> chooseFileActivityResultLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && mPeerPicked != null && result.getData() != null) {
+                            final Peer peer = mPeers.get(mPeerPicked);
+                            if (peer != null) {
+                                if (result.getData().getClipData() == null) {
+                                    sendFile(peer, result.getData().getData(), result.getData().getType());
+                                } else {
+                                    sendFile(peer, result.getData().getClipData(), result.getData().getType());
+                                }
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,7 +251,8 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         final boolean ready = mAirDropManager.ready() == STATUS_OK;
         if (!granted || !ready) {
             mIsInSetup = true;
-            startActivityForResult(new Intent(this, SetupActivity.class), REQUEST_SETUP);
+            // startActivityForResult(new Intent(this, SetupActivity.class), REQUEST_SETUP);
+            setupActivityResultLauncher.launch(new Intent(this, SetupActivity.class));
             return true;
         } else {
             return false;
@@ -239,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         requestIntent.addCategory(Intent.CATEGORY_OPENABLE);
         requestIntent.setType("*/*");
         requestIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(requestIntent, "File"), REQUEST_PICK);
+        // startActivityForResult(Intent.createChooser(requestIntent, "File"), REQUEST_PICK);
+        chooseFileActivityResultLauncher.launch(Intent.createChooser(requestIntent, "File"));
     }
 
     private void handleItemCancelClick(Peer peer, PeerState state) {
