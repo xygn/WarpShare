@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
     };
     private boolean mIsDiscovering = false;
     private boolean mShouldKeepDiscovering = false;
+    // TODO: Combining two launchers into one
     ActivityResultLauncher<Intent> chooseFileActivityResultLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -243,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
 
         final boolean granted;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            granted = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PERMISSION_GRANTED;
+            granted = (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PERMISSION_GRANTED) && (checkSelfPermission(Manifest.permission.BLUETOOTH_ADVERTISE) == PERMISSION_GRANTED);
         } else {
             granted = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
         }
@@ -251,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         final boolean ready = mAirDropManager.ready() == STATUS_OK;
         if (!granted || !ready) {
             mIsInSetup = true;
-            // startActivityForResult(new Intent(this, SetupActivity.class), REQUEST_SETUP);
             setupActivityResultLauncher.launch(new Intent(this, SetupActivity.class));
             return true;
         } else {
@@ -266,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements DiscoverListener 
         requestIntent.addCategory(Intent.CATEGORY_OPENABLE);
         requestIntent.setType("*/*");
         requestIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        // startActivityForResult(Intent.createChooser(requestIntent, "File"), REQUEST_PICK);
         chooseFileActivityResultLauncher.launch(Intent.createChooser(requestIntent, "File"));
     }
 

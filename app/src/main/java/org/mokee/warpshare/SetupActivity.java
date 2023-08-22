@@ -17,35 +17,30 @@
 package org.mokee.warpshare;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
+import org.jetbrains.annotations.NotNull;
 import org.mokee.warpshare.airdrop.AirDropManager;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 import static android.provider.Settings.ACTION_WIFI_SETTINGS;
 import static org.mokee.warpshare.airdrop.AirDropManager.STATUS_NO_BLUETOOTH;
 import static org.mokee.warpshare.airdrop.AirDropManager.STATUS_NO_WIFI;
 
 @SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class SetupActivity extends AppCompatActivity {
-
-    private static final String TAG = "SetupActivity";
-
     private static final int REQUEST_PERM = 1;
 
     private AirDropManager mAirDropManager;
@@ -67,8 +62,6 @@ public class SetupActivity extends AppCompatActivity {
             updateState();
         }
     };
-
-    private long mLastRequestForPermission = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,14 +122,20 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-        mLastRequestForPermission = SystemClock.elapsedRealtime();
-        requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES,Manifest.permission.READ_MEDIA_AUDIO,Manifest.permission.READ_MEDIA_VIDEO,WRITE_EXTERNAL_STORAGE, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT}, 5);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_PERM);
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_PERM);
+        } else {
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_PERM);
+        }
     }
 
     private void setupWifi() {
         startActivity(new Intent(ACTION_WIFI_SETTINGS));
     }
 
+    @SuppressLint("MissingPermission")
     private void turnOnBluetooth() {
         startActivity(new Intent(ACTION_REQUEST_ENABLE));
     }
@@ -146,19 +145,30 @@ public class SetupActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERM:
-                if (grantResults[0] != PERMISSION_GRANTED) {
-                    // If "Don't ask again" was selected, permissions request will be rejected
-                    // immediately after they was requested.
-                    if (SystemClock.elapsedRealtime() - mLastRequestForPermission < 200) {
-                        final Intent intent = new Intent(ACTION_APPLICATION_DETAILS_SETTINGS);
-                        intent.setData(Uri.fromParts("package", getPackageName(), null));
-                        startActivity(intent);
-                    }
+                if (grantResults.length == 0 || grantResults[0] != PERMISSION_GRANTED) {
+                    AlertDialog.Builder alertDialog = getAlertDialog();
+                    alertDialog.show();
                 }
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @NotNull
+    private AlertDialog.Builder getAlertDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Grant Permissions");
+        alertDialog.setMessage("The app uses the network to transfer files. Please allow all permissions in the following settings.");
+        alertDialog.setPositiveButton("Grant",
+                (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
+                    startActivity(intent);
+                    dialog.cancel();
+                });
+        alertDialog.setNegativeButton("Cancel",
+                (dialog, which) -> dialog.cancel());
+        return alertDialog;
     }
 
 }
